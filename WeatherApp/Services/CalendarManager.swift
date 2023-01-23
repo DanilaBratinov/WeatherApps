@@ -19,6 +19,7 @@ class CalendarManager {
         let currentDay = calendar.component(.weekday, from: date)
         
         var day: String
+        
         switch currentDay {
         case 1:
             day = "Воскресенье"

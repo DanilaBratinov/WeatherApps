@@ -38,29 +38,4 @@ class NetworkManager {
             }
         }.resume()
     }
-    
-    func getRequest<T: Decodable>(type: T.Type, from url: String, completion: @escaping(Result<Any, NetworkError>)  -> Void) {
-        guard let url = URL(string: url) else {
-            completion(.failure(.invalidURL))
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.addValue("X-Yandex-API-Key", forHTTPHeaderField: "d977696d-c43d-4202-be70-2703a6a6abb5")
-        
-        URLSession.shared.dataTask(with: request) { data, _, error in
-            guard let data else {
-                completion(.failure(.noData))
-                return
-            }
-            
-            do {
-                let type = try JSONDecoder().decode(T.self, from: data)
-                completion(.success(type))
-            } catch {
-                completion(.failure(.decodingError))
-            }
-        }.resume()
-    }
 }

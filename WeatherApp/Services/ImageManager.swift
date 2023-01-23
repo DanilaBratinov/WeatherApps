@@ -9,7 +9,8 @@ class ImageManager {
         func set(color: String) {
             imageView.image = UIImage(systemName: color)
         }
-        guard let text = title else { return}
+        
+        guard let text = title else { return }
         
         switch text {
         case "пасмурно":

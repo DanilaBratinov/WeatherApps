@@ -3,38 +3,20 @@ import CoreLocation
 
 final class StartViewController: UICollectionViewController {
     private var cities: [Cities] = []
+    private var timer: Timer?
     
     private let locationManager = CLLocationManager()
     private let refreshControl = UIRefreshControl()
-    
-    private let gradientLayer = CAGradientLayer()
-    
+        
     //    MARK: - ViewDidLoad
     override func viewDidLoad() {
         startLocationManager()
-        
-        collectionView.alwaysBounceVertical = true
-        refreshControl.addTarget(self, action: #selector(refreshWeather), for: .valueChanged)
-        collectionView.addSubview(refreshControl)
-        collectionView.refreshControl = refreshControl
+        autoUpdate()
+        setupRefreshController()
         
         title = CalendarManager.shared.getWeekday()
-        
     }
-    
-    //  MARK: - upToRefresh
-    @objc private func refreshWeather() {
-        collectionView.refreshControl?.beginRefreshing()
-        
-        cities.removeAll()
-        
-        for link in NetworkManager.shared.links {
-            self.updateWeather(with: link)
-            self.cities = self.cities.sorted(by: { $0.name > $1.name})
-            self.refreshControl.endRefreshing()
-        }
-    }
-    
+
     //    MARK: - UICollectionView
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         cities.count
@@ -46,21 +28,42 @@ final class StartViewController: UICollectionViewController {
         
         cell.configure(with: city)
         
-        cell.layer.masksToBounds = false // or true
-        cell.layer.shadowColor = #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1) // grey
+        cell.layer.masksToBounds = false
+        cell.layer.shadowColor = UIColor.gray.cgColor
         cell.layer.shadowOffset = CGSize(width: 5.0, height: 5.0)
         cell.layer.shadowRadius = 5.0
         cell.layer.shadowOpacity = 0.2
         
-        cell.backgroundColor = UIColor(named: "Color")
+        cell.backgroundColor = UIColor(named: "cellColor")
         
         return cell
     }
-    
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let city = cities[indexPath.item]
-        performSegue(withIdentifier: "showDetails", sender: city)
+
+//    MARK: - Private methods
+    private func setupRefreshController() {
+        collectionView.alwaysBounceVertical = true
+        refreshControl.addTarget(self, action: #selector(refreshWeather), for: .valueChanged)
+        collectionView.addSubview(refreshControl)
+        collectionView.refreshControl = refreshControl
     }
+    
+    private func autoUpdate() {
+        timer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(refreshWeather), userInfo: nil, repeats: false)
+        title = CalendarManager.shared.getWeekday()
+    }
+    
+    //  MARK: - upToRefresh
+    @objc private func refreshWeather() {
+        collectionView.refreshControl?.beginRefreshing()
+        
+        cities.removeAll()
+        
+        for link in NetworkManager.shared.links {
+            self.updateWeather(with: link)
+            self.refreshControl.endRefreshing()
+        }
+    }
+    
     
     //MARK: - SearchButton
     @IBAction func searchButton(_ sender: UIBarButtonItem) {
@@ -95,7 +98,7 @@ extension StartViewController {
                         lat: weatherData.coord.lat,
                         lon: weatherData.coord.lon)
                 )
-                print(weatherData)
+                
                 self?.collectionView.reloadData()
             case .failure(let error):
                 NetworkManager.shared.links.removeLast()
@@ -128,7 +131,6 @@ extension StartViewController: CLLocationManagerDelegate {
                 if url != link {
                     NetworkManager.shared.links.remove(at: 0)
                     NetworkManager.shared.links.insert(url, at: 0)
-                    collectionView.reloadData()
                     
                     updateWeather(with: link)
                 }
@@ -155,14 +157,5 @@ extension StartViewController {
         }
         
         present(alert, animated: true)
-    }
-}
-
-//MARK: - Perform
-
-extension StartViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let detailVC = segue.destination as? DetailsViewController else { return }
-        detailVC.city = sender as? Cities
     }
 }
