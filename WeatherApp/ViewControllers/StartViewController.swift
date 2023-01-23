@@ -43,7 +43,7 @@ final class StartViewController: UICollectionViewController {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! StartViewCell
         let city = cities[indexPath.item]
-                
+        
         cell.configure(with: city)
         
         cell.layer.masksToBounds = false // or true
@@ -51,7 +51,7 @@ final class StartViewController: UICollectionViewController {
         cell.layer.shadowOffset = CGSize(width: 5.0, height: 5.0)
         cell.layer.shadowRadius = 5.0
         cell.layer.shadowOpacity = 0.2
-
+        
         cell.backgroundColor = UIColor(named: "Color")
         
         return cell
@@ -82,7 +82,7 @@ extension StartViewController: UICollectionViewDelegateFlowLayout {
 //MARK: - JSONParse
 extension StartViewController {
     private func updateWeather(with url: String) {
-        NetworkManager.shared.fetch(CurrentWeather.self, from: url) { [weak self] result in
+        NetworkManager.shared.fetch(Weather.self, from: url) { [weak self] result in
             switch result {
             case .success(let weatherData):
                 self?.cities.append(
@@ -130,9 +130,7 @@ extension StartViewController: CLLocationManagerDelegate {
                     NetworkManager.shared.links.insert(url, at: 0)
                     collectionView.reloadData()
                     
-                    for link in NetworkManager.shared.links {
-                        updateWeather(with: link)
-                    }
+                    updateWeather(with: link)
                 }
             }
         }
