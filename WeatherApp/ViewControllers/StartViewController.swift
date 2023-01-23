@@ -7,7 +7,7 @@ final class StartViewController: UICollectionViewController {
     
     private let locationManager = CLLocationManager()
     private let refreshControl = UIRefreshControl()
-        
+    
     //    MARK: - ViewDidLoad
     override func viewDidLoad() {
         startLocationManager()
@@ -16,7 +16,7 @@ final class StartViewController: UICollectionViewController {
         
         title = CalendarManager.shared.getWeekday()
     }
-
+    
     //    MARK: - UICollectionView
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         cities.count
@@ -38,8 +38,8 @@ final class StartViewController: UICollectionViewController {
         
         return cell
     }
-
-//    MARK: - Private methods
+    
+    //    MARK: - Private methods
     private func setupRefreshController() {
         collectionView.alwaysBounceVertical = true
         refreshControl.addTarget(self, action: #selector(refreshWeather), for: .valueChanged)

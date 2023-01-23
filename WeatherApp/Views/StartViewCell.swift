@@ -7,7 +7,7 @@
 
 import UIKit
 
-class StartViewCell: UICollectionViewCell {
+final class StartViewCell: UICollectionViewCell {
     
     @IBOutlet var weatherImage: UIImageView!
     @IBOutlet var cityLabel: UILabel!
